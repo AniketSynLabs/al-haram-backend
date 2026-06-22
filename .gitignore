@@ -1,0 +1,11 @@
+.env*
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.sql
+*.pdf
+
+go.work
+go.work.sum
