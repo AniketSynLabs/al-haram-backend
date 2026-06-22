@@ -32,11 +32,7 @@ func main() {
 
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization},
-	}))
+	e.Use(middleware.CORS())
 
 	pub := e.Group("/api")
 	admin := e.Group("/api/admin", mw.BasicAuth(cfg.AdminUsername, cfg.AdminPassword))
