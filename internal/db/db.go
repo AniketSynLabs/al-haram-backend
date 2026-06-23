@@ -125,11 +125,11 @@ CREATE TABLE IF NOT EXISTS al_haram.policies (
 -- ── Seed data ─────────────────────────────────────────────────────────────────
 INSERT INTO al_haram.site_settings (key, value) VALUES
     ('brand_name',    'Faxman Travels'),
-    ('tagline',       'Sacred Journeys Since 2004'),
+    ('tagline',       'Make Your Next Trip Awesome'),
     ('hero_title',    'Your Journey to Makkah Starts Here'),
-    ('hero_subtitle', 'Economy to Super Deluxe Umrah packages with flights, visa, hotels & full Ziyarat. 22+ years of safe, affordable, hassle-free travel.'),
+    ('hero_subtitle', 'Economy to Super Deluxe Umrah packages with flights, visa, hotels & full Ziyarat. Trusted by pilgrims since 2004.'),
     ('about_title',   'Serving Pilgrims with Trust Since 2004'),
-    ('about_body',    'Faxman Travels was founded in 2004 by Mr. Shaikh Iftekhar Ahmad with a clear vision — to provide reliable, trustworthy, and customer-friendly travel services to pilgrims from Fatehpur and beyond. Since 2018, the agency has grown under the management of Mr. Shaikh Zaid Ahmad, carrying the legacy forward with modern travel solutions and a commitment to innovation.'),
+    ('about_body',    'Faxman Travels was founded in 2004 by Mr. Shaikh Iftekhar Ahmad with a clear vision — to provide reliable, trustworthy, and customer-friendly travel services to pilgrims from Fatehpur and beyond. Since 2018, the agency has grown under the management of Mr. Shaikh Zaid Siddiqui, carrying the legacy forward with modern travel solutions and a commitment to innovation.'),
     ('whatsapp',      '+918418021570'),
     ('email',         'faxman.travels@gmail.com'),
     ('address',       'Basement of Dulhan Marriage Hall, Mahajari, Fatehpur (U.P.) — Pincode 212601'),
@@ -138,13 +138,19 @@ ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO al_haram.bank_details (id, account_name, bank_name, account_no, ifsc, branch, note) VALUES (
     1,
-    'Faxman Travels',
-    'Bank of Baroda',
-    'Contact us for details',
-    'Contact us for details',
+    'Shaikh Zaid Ahmad',
+    'HDFC Bank',
+    '50200032599285',
+    'HDFC0001895',
     'Fatehpur Branch, U.P.',
     'After payment, share the transaction screenshot on WhatsApp for confirmation.'
-) ON CONFLICT (id) DO NOTHING;
+) ON CONFLICT (id) DO UPDATE SET
+    account_name = EXCLUDED.account_name,
+    bank_name    = EXCLUDED.bank_name,
+    account_no   = EXCLUDED.account_no,
+    ifsc         = EXCLUDED.ifsc,
+    branch       = EXCLUDED.branch,
+    note         = EXCLUDED.note;
 
 INSERT INTO al_haram.policies (id, title, content) VALUES
     ('terms',   'Terms & Conditions',
@@ -162,45 +168,45 @@ INSERT INTO al_haram.packages
      shuttle_makkah, shuttle_madinah, occupancy,
      features, documents, rate_note, sort_order)
 VALUES
-('pkg_economy', 'Economy Umrah Package', 'Economy', 15, 'On Request',
+('pkg_economy', 'Economy Umrah Package 2026', 'Economy', 16, 'From ₹92,000',
  'https://i.pinimg.com/1200x/24/7b/36/247b36c6b1475fe7405647c54c4a616d.jpg',
- 'Via Flight (connecting)',
- 'Budget Hotel', '1500–2000 m',
- 'Standard Hotel', 'Within 1 km',
- 'Free 24×7 shuttle', 'Shuttle for Namaz only', '5–6 persons per room',
- '["Round-trip air ticket (via flight)","Umrah visa","Hotel on sharing basis (5–6 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water","Free 24×7 Haram shuttle (Makkah)"]',
- '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
- 'Rates based on current airline & hotel fares. Any future increase will be borne by the pilgrim.', 1),
+ 'Oman Air (LKO-MCT-JED)',
+ 'Nokhba Al-Khair or Similar', '1200 m (24×7 shuttle · 150 m walk from drop point)',
+ 'Markaziya or Similar', '700–800 m',
+ 'Free 24×7 Haram shuttle', 'Walking distance', '5–6 persons per room',
+ '["Round-trip air ticket (Oman Air)","Umrah visa","Hotel on sharing basis (5–6 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","5 Ltr Zam Zam water free"]',
+ '["Valid passport (min. 6 months validity)","PAN card"]',
+ 'Rates based on current airline & hotel fares. Any increase in future will be borne by the pilgrim.', 1),
 
-('pkg_semi_deluxe', 'Semi Deluxe Umrah Package', 'Semi Deluxe', 15, 'On Request',
+('pkg_semi_deluxe', 'Semi Deluxe Umrah Package 2026', 'Semi Deluxe', 15, 'From ₹1,07,000',
  'https://i.pinimg.com/736x/92/1f/f9/921ff99d18598b360b2a5705d1f7b653.jpg',
- 'Option A: Direct deluxe flight + economy hotels | Option B: Via flight + deluxe hotels',
- 'Economy / Deluxe Hotel (as per option)', '500–700 m (Option B)',
- 'Economy / Deluxe Hotel (as per option)', '200–250 m (Option B)',
+ 'Oman Air / Air India (via Lucknow)',
+ 'Manar Al Azhar or Similar', '600 m',
+ 'Markaziya or Similar', '300 m',
  'Shuttle provided', 'Shuttle provided', '4–5 persons per room',
- '["Round-trip air ticket","Umrah visa","Hotel on sharing basis (4–5 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water","Two options: direct deluxe flight OR deluxe hotels"]',
+ '["Round-trip air ticket","Umrah visa","Hotel on sharing basis (4–5 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","5 Ltr Zam Zam water","WiFi","Free laundry"]',
  '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
- 'Rates based on current airline & hotel fares. Any future increase will be borne by the pilgrim.', 2),
+ 'Rates based on current airline & hotel fares. Any increase in future will be borne by the pilgrim.', 2),
 
 ('pkg_deluxe', 'Deluxe Umrah Package', 'Deluxe', 15, 'On Request',
  'https://i.pinimg.com/736x/1e/f9/ed/1ef9ed0de60fb7ae04073b10f0b05951.jpg',
  'Direct / Deluxe Flight',
- 'Deluxe Hotel', '500–700 m',
- 'Deluxe Hotel', '200–250 m',
- 'AC bus shuttle', 'AC bus shuttle', '4 persons per room',
- '["Round-trip air ticket (direct flight)","Umrah visa","Deluxe hotel on sharing basis (4 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water"]',
+ 'Deluxe Hotel', '300–500 m',
+ 'Deluxe Hotel', '200–300 m',
+ 'AC bus shuttle', 'AC bus shuttle', '3–4 persons per room',
+ '["Round-trip air ticket (direct flight)","Umrah visa","Deluxe hotel on sharing basis (3–4 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water"]',
  '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
- 'Rates based on current airline & hotel fares. Any future increase will be borne by the pilgrim.', 3),
+ 'Rates based on current airline & hotel fares. Any increase in future will be borne by the pilgrim.', 3),
 
 ('pkg_super_deluxe', 'Super Deluxe Umrah Package', 'Super Deluxe', 15, 'On Request',
  'https://i.pinimg.com/736x/28/43/23/28432334b5bf415ebd5e64aebc892a41.jpg',
  'Premium / Business Class Flight',
- 'Le Méridien Towers Makkah (5-Star)', '100–150 m',
+ 'Le Meridien Towers Makkah (5-Star)', '100–150 m',
  'Super Deluxe Hotel', '100–150 m',
  'Private AC transport', 'Private AC transport', '2–3 persons per room',
- '["Round-trip premium/business flight","Umrah visa","5-Star hotel on sharing basis (2–3 persons)","Breakfast, lunch & dinner","Private AC transport","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water","Le Méridien Towers Makkah or equivalent"]',
+ '["Round-trip premium/business flight","Umrah visa","5-Star hotel on sharing basis (2–3 persons)","Breakfast, lunch & dinner","Private AC transport","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water","Le Meridien Towers Makkah or equivalent"]',
  '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
- 'Rates based on current airline & hotel fares. Any future increase will be borne by the pilgrim.', 4)
+ 'Rates based on current airline & hotel fares. Any increase in future will be borne by the pilgrim.', 4)
 ON CONFLICT (id) DO UPDATE SET
     title           = EXCLUDED.title,
     tier            = EXCLUDED.tier,
@@ -233,4 +239,37 @@ VALUES
     ('svc_dummy_ticket', 'Dummy Ticket & Hotel Voucher',  'Verified dummy air tickets and hotel booking vouchers for visa purposes.',       '🎫', '', '', 8),
     ('svc_insurance',    'Travel Insurance',              'Affordable travel insurance plans for international and domestic trips.',        '🛡️', '', '', 9)
 ON CONFLICT (id) DO NOTHING;
+
+-- ── Seed schedule (Umrah 2026 / 1447-1448 Hijri) ─────────────────────────────
+INSERT INTO al_haram.umrah_schedule
+    (id, season, departure_date, return_date, duration_nights, airline, route, package_tier, rate, seats_left, status, notes)
+VALUES
+    ('sch_2026_01', '2026 / 1447', '2026-07-07', '2026-07-22', 16, 'Oman Air', 'LKO-MCT-JED / JED-MCT-LKO', 'Economy', '₹92,000', 0, 'Available', ''),
+    ('sch_2026_02', '2026 / 1447', '2026-07-23', '2026-08-07', 16, 'Oman Air', 'LKO-MCT-JED / MED-MCT-LKO', 'Economy', '₹92,000', 0, 'Available', ''),
+    ('sch_2026_03', '2026 / 1447', '2026-08-07', '2026-08-22', 16, 'Oman Air', 'LKO-MCT-JED / MED-MCT-LKO', 'Economy', '₹92,000', 0, 'Available', ''),
+    ('sch_2026_04', '2026 / 1447', '2026-09-09', '2026-09-23', 15, 'Oman Air', 'LKO-MCT-JED / JED-MCT-LKO', 'Economy', '₹90,000', 0, 'Available', ''),
+    ('sch_2026_05', '2026 / 1447', '2026-09-14', '2026-09-30', 17, 'Oman Air', 'LKO-MCT-JED / MED-MCT-LKO', 'Economy', '₹93,000', 0, 'Available', ''),
+    ('sch_2026_06', '2026 / 1447', '2026-10-06', '2026-10-21', 16, 'Oman Air', 'LKO-MCT-JED / MED-MCT-LKO', 'Economy', '₹92,000', 0, 'Available', ''),
+    ('sch_2026_07', '2026 / 1447', '2026-10-15', '2026-10-30', 16, 'Oman Air', 'LKO-MCT-JED / MED-MCT-LKO', 'Economy', '₹92,000', 0, 'Available', ''),
+    ('sch_2026_s01', '2026 / 1448', '2026-06-27', '2026-07-11', 15, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,07,000', 0, 'Available', 'Group 1 — 0845-1550 / 1800-0805'),
+    ('sch_2026_s02', '2026 / 1448', '2026-06-30', '2026-07-15', 16, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,07,000', 0, 'Sold',      'Group 2 — Sold Out'),
+    ('sch_2026_s03', '2026 / 1448', '2026-07-08', '2026-07-23', 16, 'Air India', 'LKO-DEL-JED', 'Semi Deluxe', '₹1,03,000', 0, 'Available', 'Group 3 — 1410-2140 / 2240-1335'),
+    ('sch_2026_s04', '2026 / 1448', '2026-07-13', '2026-07-29', 17, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,07,000', 0, 'Available', 'Group 4 — 0845-1710 / 1800-0805'),
+    ('sch_2026_s05', '2026 / 1448', '2026-07-28', '2026-08-12', 16, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,07,000', 0, 'Available', 'Group 5 — 0845-1710 / 1800-0805'),
+    ('sch_2026_s06', '2026 / 1448', '2026-08-04', '2026-08-21', 18, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,07,000', 0, 'Available', 'Group 6 — 0845-1710 / 1800-0805'),
+    ('sch_2026_s07', '2026 / 1448', '2026-08-12', '2026-08-27', 16, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,10,000', 0, 'Available', 'Group 7 — 0845-1710 / 1800-0805'),
+    ('sch_2026_s08', '2026 / 1448', '2026-08-24', '2026-09-09', 17, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,07,000', 0, 'Available', 'Group 8 — 0845-1710 / 1800-0805'),
+    ('sch_2026_s09', '2026 / 1448', '2026-09-01', '2026-09-16', 16, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,07,000', 0, 'Available', 'Group 9 — 0845-1710 / 1800-0805'),
+    ('sch_2026_s10', '2026 / 1448', '2026-09-09', '2026-09-26', 18, 'Oman Air', 'LKO-MCT-JED', 'Semi Deluxe', '₹1,07,000', 0, 'Available', 'Group 10 — 0845-1710 / 1800-0805')
+ON CONFLICT (id) DO UPDATE SET
+    season          = EXCLUDED.season,
+    departure_date  = EXCLUDED.departure_date,
+    return_date     = EXCLUDED.return_date,
+    duration_nights = EXCLUDED.duration_nights,
+    airline         = EXCLUDED.airline,
+    route           = EXCLUDED.route,
+    package_tier    = EXCLUDED.package_tier,
+    rate            = EXCLUDED.rate,
+    status          = EXCLUDED.status,
+    notes           = EXCLUDED.notes;
 `
