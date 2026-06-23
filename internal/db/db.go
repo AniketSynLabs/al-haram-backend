@@ -162,7 +162,15 @@ INSERT INTO al_haram.site_settings (key, value) VALUES
     ('stats_years',       '22+'),
     ('stats_packages',    '4'),
     ('stats_services',    '9+'),
-    ('stats_pilgrims',    '500+')
+    ('stats_pilgrims',    '500+'),
+    ('founder_1_name',    'Mr. Shaikh Iftekhar Ahmad'),
+    ('founder_1_role',    'Founder & Owner'),
+    ('founder_1_bio',     'Established Faxman Travels in 2004 with a vision to provide reliable, trustworthy, and customer-friendly travel services. For over 22 years, his leadership has been the cornerstone of trust and excellence.'),
+    ('founder_1_image_url', ''),
+    ('founder_2_name',    'Mr. Shaikh Zaid Ahmad'),
+    ('founder_2_role',    'Co-Owner & Managing Director'),
+    ('founder_2_bio',     'Joined the business in 2018, actively carrying forward the vision and legacy built by his father. Continuously working towards expanding and modernising the business under his father''s valuable guidance.'),
+    ('founder_2_image_url', '')
 ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO al_haram.bank_details (id, account_name, bank_name, account_no, ifsc, branch, note) VALUES (
