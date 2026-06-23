@@ -40,7 +40,7 @@ func marshalPackage(p model.Package) (string, string) {
 }
 
 func ListPackages() ([]model.Package, error) {
-	rows, err := db.DB.Query(`SELECT` + packageCols + `FROM packages ORDER BY sort_order`)
+	rows, err := db.DB.Query(`SELECT ` + packageCols + ` FROM packages ORDER BY sort_order`)
 	if err != nil {
 		return nil, err
 	}

@@ -9,4 +9,5 @@ func RegisterRoutes(pub, admin *echo.Group) {
 	registerScheduleRoutes(pub, admin)
 	registerEnquiryRoutes(pub, admin)
 	registerSettingsRoutes(pub, admin)
+	registerGalleryRoutes(pub, admin)
 }

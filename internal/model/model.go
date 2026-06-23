@@ -81,3 +81,13 @@ type Policy struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
+
+// GalleryItem is a single image or video in the public gallery.
+type GalleryItem struct {
+	ID        string `json:"id"`
+	URL       string `json:"url"`
+	Type      string `json:"type"`
+	Caption   string `json:"caption"`
+	SortOrder int    `json:"sortOrder"`
+	CreatedAt string `json:"createdAt"`
+}

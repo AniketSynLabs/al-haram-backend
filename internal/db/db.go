@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -19,6 +20,15 @@ func Connect(dsn string) error {
 	if err != nil {
 		return fmt.Errorf("open db: %w", err)
 	}
+
+	// Cap the pool well below Railway's per-service connection limit.
+	// Railway Hobby Postgres allows ~25 total connections; leave headroom
+	// for the Railway internal admin connections and future replicas.
+	DB.SetMaxOpenConns(10)
+	DB.SetMaxIdleConns(5)
+	DB.SetConnMaxLifetime(30 * time.Minute)
+	DB.SetConnMaxIdleTime(10 * time.Minute)
+
 	if err = DB.PingContext(context.Background()); err != nil {
 		return fmt.Errorf("ping db: %w", err)
 	}
@@ -122,6 +132,15 @@ CREATE TABLE IF NOT EXISTS al_haram.policies (
     content TEXT NOT NULL DEFAULT ''
 );
 
+CREATE TABLE IF NOT EXISTS al_haram.gallery_items (
+    id         TEXT PRIMARY KEY,
+    url        TEXT NOT NULL,
+    type       TEXT NOT NULL DEFAULT 'image',
+    caption    TEXT NOT NULL DEFAULT '',
+    sort_order INT  NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- ── Seed data ─────────────────────────────────────────────────────────────────
 INSERT INTO al_haram.site_settings (key, value) VALUES
     ('brand_name',    'Faxman Travels'),
@@ -133,7 +152,17 @@ INSERT INTO al_haram.site_settings (key, value) VALUES
     ('whatsapp',      '+918418021570'),
     ('email',         'faxman.travels@gmail.com'),
     ('address',       'Basement of Dulhan Marriage Hall, Mahajari, Fatehpur (U.P.) — Pincode 212601'),
-    ('map_url',       'https://maps.google.com/maps?q=Mahajari+Fatehpur+UP+212601&t=&z=14&ie=UTF8&iwloc=&output=embed')
+    ('map_url',       'https://maps.google.com/maps?q=Mahajari+Fatehpur+UP+212601&t=&z=14&ie=UTF8&iwloc=&output=embed'),
+    ('hero_image_url',    'https://i.pinimg.com/736x/f1/4d/bb/f14dbb8116639f8b2f2e75f5c02737d1.jpg'),
+    ('about_image_1_url', 'https://i.pinimg.com/736x/6c/6c/e3/6c6ce35320c8f2454f87e0ac83589832.jpg'),
+    ('about_image_2_url', 'https://i.pinimg.com/736x/69/00/95/6900952b20e2d8e77c63779a9aec0747.jpg'),
+    ('about_image_3_url', 'https://i.pinimg.com/1200x/08/47/31/0847310bb2c5f810476817e0858a3867.jpg'),
+    ('gallery_title',     'A Glimpse of the Holy Lands'),
+    ('gallery_subtitle',  'Beautiful moments from Makkah and Madinah.'),
+    ('stats_years',       '22+'),
+    ('stats_packages',    '4'),
+    ('stats_services',    '9+'),
+    ('stats_pilgrims',    '500+')
 ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO al_haram.bank_details (id, account_name, bank_name, account_no, ifsc, branch, note) VALUES (
@@ -154,12 +183,14 @@ INSERT INTO al_haram.bank_details (id, account_name, bank_name, account_no, ifsc
 
 INSERT INTO al_haram.policies (id, title, content) VALUES
     ('terms',   'Terms & Conditions',
-     'All bookings are subject to availability and confirmation. The customer is responsible for providing correct documents and valid information. The company is not responsible for delays caused by airlines, embassy decisions, immigration authorities, natural disasters, or any other circumstances beyond our control. Prices are based on current airline fares and hotel rates; any future increase in fares or government regulations will be borne by the pilgrim. Customers must verify all travel documents before departure. Passport validity of minimum 6 months is mandatory.'),
+     'All bookings are subject to availability and confirmation. The customer is responsible for providing correct documents and valid information at the time of booking. The company is not responsible for any delays or cancellations caused by airlines, embassy decisions, immigration authorities, natural disasters, or any other circumstances beyond our control. Prices are based on current airline fares and hotel rates; any future increase in fares or government regulations will be borne by the pilgrim. Customers must verify all travel documents before departure. Passport validity of minimum 6 months is mandatory at the time of travel.'),
     ('refund',  'Refund Policy',
-     'Refunds for air tickets, visas, hotels, and packages are subject to individual airline rules, embassy policies, hotel cancellation terms, and applicable service charges. Some services may be non-refundable once confirmed. Refund processing times vary depending on the provider. Visa fees are non-refundable once submitted to the embassy. Customers are strongly advised to read all cancellation and refund terms carefully before making payment.'),
+     'Refunds for air tickets, visas, hotels, and packages are subject to individual airline rules, embassy policies, hotel cancellation terms, and applicable service charges. Some services may be non-refundable once confirmed. Visa fees are non-refundable once submitted to the embassy. Refund processing times vary depending on the provider. Customers are strongly advised to read all cancellation and refund terms carefully before making any payment. Faxman Travels will assist in processing refund requests but cannot guarantee timelines set by third-party providers.'),
     ('privacy', 'Privacy Policy',
      'Customer data including passport details, phone numbers, email addresses, travel documents, and payment information is kept strictly confidential. We do not share personal information with third parties without explicit permission, except where required for visa processing, airline booking, or legal compliance. Basic site usage data may be collected to improve service quality. You may request deletion of your personal data at any time by contacting us directly.')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+    title   = EXCLUDED.title,
+    content = EXCLUDED.content;
 
 -- ── Seed packages ─────────────────────────────────────────────────────────────
 INSERT INTO al_haram.packages
@@ -170,43 +201,43 @@ INSERT INTO al_haram.packages
 VALUES
 ('pkg_economy', 'Economy Umrah Package 2026', 'Economy', 16, 'From ₹92,000',
  'https://i.pinimg.com/1200x/24/7b/36/247b36c6b1475fe7405647c54c4a616d.jpg',
- 'Oman Air (LKO-MCT-JED)',
- 'Nokhba Al-Khair or Similar', '1200 m (24×7 shuttle · 150 m walk from drop point)',
- 'Markaziya or Similar', '700–800 m',
- 'Free 24×7 Haram shuttle', 'Walking distance', '5–6 persons per room',
- '["Round-trip air ticket (Oman Air)","Umrah visa","Hotel on sharing basis (5–6 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","5 Ltr Zam Zam water free"]',
- '["Valid passport (min. 6 months validity)","PAN card"]',
- 'Rates based on current airline & hotel fares. Any increase in future will be borne by the pilgrim.', 1),
+ 'Oman Air (LKO-MCT-JED via Muscat)',
+ 'Nokhba Al-Khair or Similar', '1500–2000 m from Haram',
+ 'Markaziya or Similar', 'Within 1 km from Masjid an-Nabawi',
+ 'Free 24×7 Haram shuttle (150 m walk from drop point)', 'Shuttle for Namaz timings only', '5–6 persons per room',
+ '["Round-trip air ticket (Oman Air)","Umrah visa","Hotel on sharing basis (5–6 persons per room)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water"]',
+ '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
+ 'Rates are based on current airline fares and hotel rates. Any future increase in airline or hotel rates will be borne by the pilgrim.', 1),
 
 ('pkg_semi_deluxe', 'Semi Deluxe Umrah Package 2026', 'Semi Deluxe', 15, 'From ₹1,07,000',
  'https://i.pinimg.com/736x/92/1f/f9/921ff99d18598b360b2a5705d1f7b653.jpg',
- 'Oman Air / Air India (via Lucknow)',
- 'Manar Al Azhar or Similar', '600 m',
- 'Markaziya or Similar', '300 m',
- 'Shuttle provided', 'Shuttle provided', '4–5 persons per room',
- '["Round-trip air ticket","Umrah visa","Hotel on sharing basis (4–5 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","5 Ltr Zam Zam water","WiFi","Free laundry"]',
+ 'Oman Air / Air India (via Lucknow) — Direct or Via Flight',
+ 'Manar Al Azhar or Similar', '500–700 m from Haram',
+ 'Markaziya or Similar', '200–250 m from Masjid an-Nabawi',
+ 'Free 24×7 Haram shuttle', 'Walking distance / shuttle', '4–5 persons per room',
+ '["Round-trip air ticket (Oman Air / Air India)","Umrah visa","Deluxe hotel on sharing basis (4–5 persons per room)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water","Type 1: Direct/deluxe flight with economy hotels","Type 2: Economy/via flight with deluxe hotels (500–700 m Makkah, 200–250 m Madinah)"]',
  '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
- 'Rates based on current airline & hotel fares. Any increase in future will be borne by the pilgrim.', 2),
+ 'Rates are based on current airline fares and hotel rates. Any future increase in airline or hotel rates will be borne by the pilgrim.', 2),
 
 ('pkg_deluxe', 'Deluxe Umrah Package', 'Deluxe', 15, 'On Request',
  'https://i.pinimg.com/736x/1e/f9/ed/1ef9ed0de60fb7ae04073b10f0b05951.jpg',
  'Direct / Deluxe Flight',
- 'Deluxe Hotel', '300–500 m',
- 'Deluxe Hotel', '200–300 m',
- 'AC bus shuttle', 'AC bus shuttle', '3–4 persons per room',
- '["Round-trip air ticket (direct flight)","Umrah visa","Deluxe hotel on sharing basis (3–4 persons)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water"]',
+ 'Deluxe Hotel', '500–700 m from Haram',
+ 'Deluxe Hotel', '200–250 m from Masjid an-Nabawi',
+ 'Free 24×7 Haram shuttle', 'Shuttle provided', '3–4 persons per room',
+ '["Round-trip air ticket (direct/deluxe flight)","Umrah visa","Deluxe hotel on sharing basis (3–4 persons per room)","Breakfast, lunch & dinner","Local transfer by AC bus","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water"]',
  '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
- 'Rates based on current airline & hotel fares. Any increase in future will be borne by the pilgrim.', 3),
+ 'Rates are based on current airline fares and hotel rates. Any future increase in airline or hotel rates will be borne by the pilgrim.', 3),
 
 ('pkg_super_deluxe', 'Super Deluxe Umrah Package', 'Super Deluxe', 15, 'On Request',
  'https://i.pinimg.com/736x/28/43/23/28432334b5bf415ebd5e64aebc892a41.jpg',
- 'Premium / Business Class Flight',
- 'Le Meridien Towers Makkah (5-Star)', '100–150 m',
- 'Super Deluxe Hotel', '100–150 m',
- 'Private AC transport', 'Private AC transport', '2–3 persons per room',
- '["Round-trip premium/business flight","Umrah visa","5-Star hotel on sharing basis (2–3 persons)","Breakfast, lunch & dinner","Private AC transport","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water","Le Meridien Towers Makkah or equivalent"]',
+ 'Premium Direct Flight',
+ 'Le Méridien Towers Makkah (5-Star)', '100–150 m from Haram',
+ 'Super Deluxe Hotel', '100–150 m from Masjid an-Nabawi',
+ 'Private AC transport to Haram', 'Private AC transport to Masjid an-Nabawi', '2–3 persons per room',
+ '["Round-trip premium direct flight","Umrah visa","5-Star hotel on sharing basis (2–3 persons per room)","Breakfast, lunch & dinner","Private AC transport","Complete Ziyarat in Makkah & Madinah","Laundry service","Travel insurance","5 Ltr Zam Zam water","Le Méridien Towers Makkah or equivalent 5-Star"]',
  '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
- 'Rates based on current airline & hotel fares. Any increase in future will be borne by the pilgrim.', 4)
+ 'Rates are based on current airline fares and hotel rates. Any future increase in airline or hotel rates will be borne by the pilgrim.', 4)
 ON CONFLICT (id) DO UPDATE SET
     title           = EXCLUDED.title,
     tier            = EXCLUDED.tier,
