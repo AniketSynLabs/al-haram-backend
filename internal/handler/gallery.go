@@ -34,6 +34,7 @@ func createGalleryItem(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusCreated, created)
 }
 
@@ -45,6 +46,7 @@ func updateGalleryItem(c echo.Context) error {
 	if err := service.UpdateGalleryItem(c.Param("id"), g); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }
 
@@ -52,5 +54,6 @@ func deleteGalleryItem(c echo.Context) error {
 	if err := service.DeleteGalleryItem(c.Param("id")); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }

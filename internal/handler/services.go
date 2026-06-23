@@ -37,6 +37,7 @@ func createService(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusCreated, created)
 }
 
@@ -48,6 +49,7 @@ func updateService(c echo.Context) error {
 	if err := service.UpdateService(c.Param("id"), s); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }
 
@@ -55,5 +57,6 @@ func deleteService(c echo.Context) error {
 	if err := service.DeleteService(c.Param("id")); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }

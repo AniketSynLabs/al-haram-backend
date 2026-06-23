@@ -38,6 +38,7 @@ func updateSettings(c echo.Context) error {
 	if err := service.UpdateSettings(body); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }
 
@@ -57,6 +58,7 @@ func updateBankDetails(c echo.Context) error {
 	if err := service.UpdateBankDetails(b); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }
 
@@ -79,5 +81,6 @@ func updatePolicy(c echo.Context) error {
 	if err := service.UpdatePolicy(c.Param("id"), body.Title, body.Content); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }

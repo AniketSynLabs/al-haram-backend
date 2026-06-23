@@ -37,6 +37,7 @@ func createPackage(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusCreated, created)
 }
 
@@ -48,6 +49,7 @@ func updatePackage(c echo.Context) error {
 	if err := service.UpdatePackage(c.Param("id"), p); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }
 
@@ -55,5 +57,6 @@ func deletePackage(c echo.Context) error {
 	if err := service.DeletePackage(c.Param("id")); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }

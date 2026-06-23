@@ -34,6 +34,7 @@ func createScheduleEntry(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusCreated, created)
 }
 
@@ -45,6 +46,7 @@ func updateScheduleEntry(c echo.Context) error {
 	if err := service.UpdateScheduleEntry(c.Param("id"), s); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }
 
@@ -52,5 +54,6 @@ func deleteScheduleEntry(c echo.Context) error {
 	if err := service.DeleteScheduleEntry(c.Param("id")); err != nil {
 		return c.JSON(http.StatusInternalServerError, err500(err))
 	}
+	service.InvalidateBootstrapCache()
 	return c.JSON(http.StatusOK, ok())
 }
