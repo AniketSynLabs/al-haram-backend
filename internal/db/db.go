@@ -155,34 +155,6 @@ INSERT INTO al_haram.policies (id, title, content) VALUES
      'Customer data including passport details, phone numbers, email addresses, travel documents, and payment information is kept strictly confidential. We do not share personal information with third parties without explicit permission, except where required for visa processing, airline booking, or legal compliance. Basic site usage data may be collected to improve service quality. You may request deletion of your personal data at any time by contacting us directly.')
 ON CONFLICT (id) DO NOTHING;
 
--- ── Fix old combined hotel+distance values (idempotent) ──────────────────────
-UPDATE al_haram.packages SET
-    makkah_hotel  = 'Budget Hotel',
-    makkah_dist   = '1500–2000 m'
-WHERE id = 'pkg_economy' AND makkah_hotel LIKE '%,%';
-
-UPDATE al_haram.packages SET
-    makkah_hotel  = 'Economy / Deluxe Hotel (as per option)',
-    makkah_dist   = '500–700 m (Option B)',
-    madinah_hotel = 'Economy / Deluxe Hotel (as per option)',
-    madinah_dist  = '200–250 m (Option B)',
-    flight_type   = 'Option A: Direct deluxe flight + economy hotels | Option B: Via flight + deluxe hotels'
-WHERE id = 'pkg_semi_deluxe' AND makkah_hotel LIKE 'Type%';
-
-UPDATE al_haram.packages SET
-    makkah_hotel  = 'Deluxe Hotel',
-    makkah_dist   = '500–700 m',
-    madinah_hotel = 'Deluxe Hotel',
-    madinah_dist  = '200–250 m'
-WHERE id = 'pkg_deluxe' AND makkah_hotel LIKE '%,%';
-
-UPDATE al_haram.packages SET
-    makkah_hotel  = 'Le Méridien Towers Makkah (5-Star)',
-    makkah_dist   = '100–150 m',
-    madinah_hotel = 'Super Deluxe Hotel',
-    madinah_dist  = '100–150 m'
-WHERE id = 'pkg_super_deluxe' AND makkah_hotel LIKE '%,%';
-
 -- ── Seed packages ─────────────────────────────────────────────────────────────
 INSERT INTO al_haram.packages
     (id, title, tier, nights, price, image, flight_type,
@@ -230,6 +202,11 @@ VALUES
  '["Valid passport (min. 6 months validity)","2 passport-size photos (white background)","PAN card"]',
  'Rates based on current airline & hotel fares. Any future increase will be borne by the pilgrim.', 4)
 ON CONFLICT (id) DO UPDATE SET
+    title           = EXCLUDED.title,
+    tier            = EXCLUDED.tier,
+    nights          = EXCLUDED.nights,
+    price           = EXCLUDED.price,
+    image           = EXCLUDED.image,
     flight_type     = EXCLUDED.flight_type,
     makkah_hotel    = EXCLUDED.makkah_hotel,
     makkah_dist     = EXCLUDED.makkah_dist,
@@ -237,7 +214,11 @@ ON CONFLICT (id) DO UPDATE SET
     madinah_dist    = EXCLUDED.madinah_dist,
     shuttle_makkah  = EXCLUDED.shuttle_makkah,
     shuttle_madinah = EXCLUDED.shuttle_madinah,
-    occupancy       = EXCLUDED.occupancy;
+    occupancy       = EXCLUDED.occupancy,
+    features        = EXCLUDED.features,
+    documents       = EXCLUDED.documents,
+    rate_note       = EXCLUDED.rate_note,
+    sort_order      = EXCLUDED.sort_order;
 
 INSERT INTO al_haram.services
     (id, title, description, icon, price, requirements, sort_order)
