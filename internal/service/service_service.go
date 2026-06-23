@@ -31,6 +31,22 @@ func ListServices() ([]model.Service, error) {
 	return svcs, nil
 }
 
+func CreateService(s model.Service) (model.Service, error) {
+	_, err := db.DB.Exec(`
+		INSERT INTO services
+			(id,title,description,icon,price,requirements,sort_order,is_active)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+		s.ID, s.Title, s.Description, s.Icon,
+		s.Price, s.Requirements, s.SortOrder, s.IsActive,
+	)
+	return s, err
+}
+
+func DeleteService(id string) error {
+	_, err := db.DB.Exec(`DELETE FROM services WHERE id=$1`, id)
+	return err
+}
+
 func UpdateService(id string, s model.Service) error {
 	_, err := db.DB.Exec(`
 		UPDATE services SET
