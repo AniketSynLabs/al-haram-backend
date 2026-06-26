@@ -7,18 +7,26 @@ import (
 )
 
 type Config struct {
-	Port          string
-	AdminUsername string
-	AdminPassword string
-	DatabaseURL   string
+	Port             string
+	AdminUsername    string
+	AdminPassword    string
+	DatabaseURL      string
+	BaseURL          string
+	SupabaseURL      string
+	SupabaseKey      string
+	SupabaseBucket   string
 }
 
 func Load() *Config {
 	return &Config{
-		Port:          getEnv("PORT", "8080"),
-		AdminUsername: getEnv("ADMIN_USERNAME", "admin"),
-		AdminPassword: getEnv("ADMIN_PASSWORD", "faxman2024"),
-		DatabaseURL:   buildDSN(),
+		Port:           getEnv("PORT", "8080"),
+		AdminUsername:  getEnv("ADMIN_USERNAME", "admin"),
+		AdminPassword:  getEnv("ADMIN_PASSWORD", "faxman2024"),
+		DatabaseURL:    buildDSN(),
+		BaseURL:        getEnv("BASE_URL", "http://localhost:8080"),
+		SupabaseURL:    getEnv("SUPABASE_URL", ""),
+		SupabaseKey:    getEnv("SUPABASE_KEY", ""),
+		SupabaseBucket: getEnv("SUPABASE_BUCKET", "faxman-travels"),
 	}
 }
 
